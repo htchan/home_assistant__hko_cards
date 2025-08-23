@@ -2,7 +2,7 @@ class HkoRadarCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.currentTimeIndex = 29;
+    this.currentTimeIndex = 14;
     this.imageSize = '128';
     this.maxTimeSlots = 15;
     this.preloadedImages = new Map();
