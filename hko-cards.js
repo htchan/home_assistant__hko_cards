@@ -2,9 +2,9 @@ class HkoRadarCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.currentTimeIndex = 14;
     this.imageSize = '128';
     this.maxTimeSlots = 15;
+    this.currentTimeIndex = this.maxTimeSlots - 1;
     this.preloadedImages = new Map();
   }
 
@@ -46,48 +46,15 @@ class HkoRadarCard extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
-        .card {
-          background: var(--card-background-color);
-          border-radius: var(--ha-card-border-radius);
-          box-shadow: var(--ha-card-box-shadow);
-          padding: 16px;
-          font-family: var(--paper-font-body1_-_font-family);
-        }
-        .header {
-          font-size: 18px;
-          font-weight: 500;
-          margin-bottom: 16px;
-          color: var(--primary-text-color);
-        }
-        .radar-container {
-          text-align: center;
-          margin-bottom: 16px;
-        }
-        .radar-image {
+        img {
           max-width: 100%;
           height: auto;
           border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .controls {
-          margin-bottom: 16px;
-        }
-        .time-slider {
-          width: 100%;
-          margin-bottom: 8px;
-        }
-        .time-display {
+        .center {
           text-align: center;
-          font-size: 14px;
-          color: var(--secondary-text-color);
-          margin-bottom: 16px;
         }
-        .size-buttons {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-        }
-        .size-button {
+        .ha-card-button {
           padding: 8px 16px;
           border: 1px solid var(--divider-color);
           background: var(--card-background-color);
@@ -96,53 +63,37 @@ class HkoRadarCard extends HTMLElement {
           cursor: pointer;
           transition: all 0.2s;
         }
-        .size-button:hover {
+        .ha-card-button:hover {
           background: var(--secondary-background-color);
         }
-        .size-button.active {
+        .ha-card-button.active {
           background: var(--primary-color);
           color: var(--text-primary-color);
           border-color: var(--primary-color);
         }
-        .loading {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 200px;
-          color: var(--secondary-text-color);
-        }
       </style>
-      <div class="card">
-        <div class="header">HKO Radar</div>
-        <div class="radar-container">
-          <img class="radar-image" src="${this.getImageUrl()}" alt="HKO Radar" 
-               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-          <div class="loading" style="display: none;">Image not available</div>
+      <ha-card>
+        <div class="card-content">
+          <img id="radar-image" src="${this.getImageUrl()}" alt="HKO Radar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
         </div>
-        <div class="controls">
-          <input type="range" class="time-slider" 
-                 min="0" max="${this.maxTimeSlots - 1}" 
-                 value="${this.currentTimeIndex}">
-          <div class="time-display">
-            ${this.getTimeForIndex(this.currentTimeIndex).toLocaleString()}
-          </div>
+        <div class="card-content center">
+          <input type="range" id="time-slider" style="width: 100%;" min="0" max="${this.maxTimeSlots - 1}" value="${this.currentTimeIndex}">
+          <div id="time-display">${this.getTimeForIndex(this.currentTimeIndex).toLocaleString()}</div>
         </div>
-        <div class="size-buttons">
-          <button class="size-button ${this.imageSize === '064' ? 'active' : ''}" data-size="064">Small</button>
-          <button class="size-button ${this.imageSize === '128' ? 'active' : ''}" data-size="128">Medium</button>
-          <button class="size-button ${this.imageSize === '256' ? 'active' : ''}" data-size="256">Large</button>
+        <div class="card-content center">
+          <button class="ha-card-button ${this.imageSize === '064' ? 'active' : ''}" data-size="064">Small</button>
+          <button class="ha-card-button ${this.imageSize === '128' ? 'active' : ''}" data-size="128">Medium</button>
+          <button class="ha-card-button ${this.imageSize === '256' ? 'active' : ''}" data-size="256">Large</button>
         </div>
-      </div>
+      </ha-card>
     `;
 
     this.setupEventListeners();
   }
 
   setupEventListeners() {
-    const slider = this.shadowRoot.querySelector('.time-slider');
-    const sizeButtons = this.shadowRoot.querySelectorAll('.size-button');
-    const radarImage = this.shadowRoot.querySelector('.radar-image');
-    const loadingDiv = this.shadowRoot.querySelector('.loading');
+    const slider = this.shadowRoot.querySelector('#time-slider');
+    const sizeButtons = this.shadowRoot.querySelectorAll('.ha-card-button');
 
     slider.addEventListener('input', (e) => {
       this.currentTimeIndex = parseInt(e.target.value);
@@ -158,34 +109,20 @@ class HkoRadarCard extends HTMLElement {
         this.preloadImages();
       });
     });
-
-    radarImage.addEventListener('load', () => {
-      radarImage.style.display = 'block';
-      loadingDiv.style.display = 'none';
-    });
-
-    radarImage.addEventListener('error', () => {
-      radarImage.style.display = 'none';
-      loadingDiv.style.display = 'flex';
-    });
   }
 
   updateImage() {
-    const radarImage = this.shadowRoot.querySelector('.radar-image');
-    const loadingDiv = this.shadowRoot.querySelector('.loading');
-    
-    loadingDiv.style.display = 'flex';
-    radarImage.style.display = 'none';
+    const radarImage = this.shadowRoot.querySelector('#radar-image');
     radarImage.src = this.getImageUrl();
   }
 
   updateTimeDisplay() {
-    const timeDisplay = this.shadowRoot.querySelector('.time-display');
+    const timeDisplay = this.shadowRoot.querySelector('#time-display');
     timeDisplay.textContent = this.getTimeForIndex(this.currentTimeIndex).toLocaleString();
   }
 
   updateSizeButtons() {
-    const sizeButtons = this.shadowRoot.querySelectorAll('.size-button');
+    const sizeButtons = this.shadowRoot.querySelectorAll('.ha-card-button');
     sizeButtons.forEach(button => {
       button.classList.toggle('active', button.dataset.size === this.imageSize);
     });
