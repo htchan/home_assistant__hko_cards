@@ -1,10 +1,17 @@
-export function registerCard(card) {
-    customElements.define(card.cardType, card);
+import { HomeAssistantCard } from "../cards/types";
 
-    window.customCards = window.customCards || [];
-    window.customCards.push({
+
+export function registerCard(card: typeof HomeAssistantCard) {
+    customElements.define(card.cardType, card);
+    const windowWithCards = window as unknown as Window & {
+        customCards: unknown[];
+    };
+    windowWithCards.customCards = windowWithCards.customCards || [];
+
+    windowWithCards.customCards.push({
         type: card.cardType,
         name: card.cardName,
         description: card.cardDescription,
+        preview: card.cardPreview,
     });
 }

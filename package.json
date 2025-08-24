@@ -16,7 +16,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w"
-  },
+  },    
   "dependencies": {
     "lit": "^3.3.1"
   },

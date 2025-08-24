@@ -3,44 +3,80 @@ import {
     NAME,
     DESCRIPTION,
     MAX_TIME_SLOTS,
-    IMG_SIZE_SMALL,
     IMG_SIZE_MEDIUM,
-    IMG_SIZE_LARGE,
     IMG_TIME_OFFSET_MINUTES,
     IMG_INTERVAL_SLOT_MINUTES
 } from "./const";
+import { HkoRadarCardConfig } from "./config";
 
-import { cardStyles } from "../../utils/card-styles";
+import { html } from "lit";
 
-export class HkoRadarCard extends HTMLElement {
-    private maxTimeSlots: number = MAX_TIME_SLOTS;
-    private currentTimeIndex: number = MAX_TIME_SLOTS - 1;
-    private imgSize: string = IMG_SIZE_MEDIUM;
-    private config: any;
+
+import { HomeAssistantCard } from "../types";
+import { cardStyles } from "./card-style";
+
+export class HkoRadarCard extends HomeAssistantCard {
+    private config: HkoRadarCardConfig = (this.constructor as typeof HkoRadarCard).getStubConfig();
+    private currentTimeIndex: number = this.config.timeSlotCount - 1;
+    private imgSize: string = this.config.defaultSize;
     private preloadedImages: Map<string, HTMLImageElement> = new Map();
 
-    static get cardType(): string {
-        return TYPE;
-    }
-    static get cardName(): string {
-        return NAME;
-    }
-    static get cardDescription(): string {
-        return DESCRIPTION;
-    }
-
-    constructor() {
-        super();
-        this.attachShadow({ mode: "open" });
+    static get properties() {
+        return {
+            config: { type: Object },
+            currentTimeIndex: { type: Number },
+            imgSize: { type: String },
+            preloadedImages: { type: Object },
+        };
     }
 
-    setConfig(config: any): void {
+    static get cardType(): string { return TYPE; }
+    static get cardName(): string { return NAME; }
+    static get cardDescription(): string { return DESCRIPTION; }
+    static get cardPreview(): boolean { return true; }
+
+    static getStubConfig(): HkoRadarCardConfig {
+        return {
+            defaultSize: IMG_SIZE_MEDIUM,
+            timeSlotCount: MAX_TIME_SLOTS,
+        };
+    }
+
+    setConfig(config: HkoRadarCardConfig): void {
         if (!config) {
-        throw new Error('Invalid configuration');
+            throw new Error('Invalid configuration');
         }
-        this.config = config;
-        this.render();
+        this.config = config
+        this.imgSize = this.config.defaultSize;
+        this.currentTimeIndex = this.config.timeSlotCount - 1;
+
         this.preloadImages();
+    }
+
+    render() {
+        return html`
+            <style>${cardStyles.cssText}</style>
+            <ha-card>
+                <div class="card-content">
+                    <img id="radar-image" src="${this.getPreloadedImageUrl()}" alt="HKO Radar" />
+                </div>
+                <div class="card-content center">
+                    <input 
+                        type="range"
+                        style="width: 100%;"
+                        min="0" max="${this.config.timeSlotCount - 1}"
+                        value="${this.currentTimeIndex}"
+                        @input="${this._onSliderInput}"
+                    />
+                    <div id="time-display">${this.getTimeForIndex(this.currentTimeIndex).toLocaleString()}</div>
+                </div>
+                <div class="card-content center">
+                    <button class="ha-card-button ${this.imgSize === '064' ? 'active' : ''}" data-size="064" @click="${this._onButtonClick}">Small</button>
+                    <button class="ha-card-button ${this.imgSize === '128' ? 'active' : ''}" data-size="128" @click="${this._onButtonClick}">Medium</button>
+                    <button class="ha-card-button ${this.imgSize === '256' ? 'active' : ''}" data-size="256" @click="${this._onButtonClick}">Large</button>
+                </div>
+            </ha-card>
+        `;
     }
 
     private getTimeForIndex(index: number): Date {
@@ -48,7 +84,7 @@ export class HkoRadarCard extends HTMLElement {
         const roundedMinutes = Math.floor(latestTime.getMinutes() / IMG_INTERVAL_SLOT_MINUTES) * IMG_INTERVAL_SLOT_MINUTES;
         latestTime.setMinutes(roundedMinutes, 0, 0);
         
-        return new Date(latestTime.getTime() - ((this.maxTimeSlots - 1 - index) * IMG_INTERVAL_SLOT_MINUTES * 60000));
+        return new Date(latestTime.getTime() - ((this.config.timeSlotCount - 1 - index) * IMG_INTERVAL_SLOT_MINUTES * 60000));
     }
 
     private formatTime(date: Date): string {
@@ -66,67 +102,23 @@ export class HkoRadarCard extends HTMLElement {
         return `https://www.hko.gov.hk/wxinfo/radars/rad_${this.imgSize}_png/2d${this.imgSize}nradar_${formatted}.jpg`;
     }
 
-    render() {
-        this.shadowRoot!.innerHTML = `
-            <style>${cardStyles.cssText}</style>
-            <ha-card>
-                <div>testing v0.0.1</div>
-                <div class="card-content">
-                    <img id="radar-image" src="${this.getImageUrl()}" alt="HKO Radar" />
-                </div>
-                <div class="card-content center">
-                    <input type="range" id="time-slider" style="width: 100%;" min="0" max="${this.maxTimeSlots - 1}" value="${this.currentTimeIndex}">
-                    <div id="time-display">${this.getTimeForIndex(this.currentTimeIndex).toLocaleString()}</div>
-                </div>
-                <div class="card-content center">
-                    <button class="ha-card-button ${this.imgSize === '064' ? 'active' : ''}" data-size="064">Small</button>
-                    <button class="ha-card-button ${this.imgSize === '128' ? 'active' : ''}" data-size="128">Medium</button>
-                    <button class="ha-card-button ${this.imgSize === '256' ? 'active' : ''}" data-size="256">Large</button>
-                </div>
-            </ha-card>
-        `;
-        this.setupEventListeners();
+    private getPreloadedImageUrl(): string {
+        const url = this.getImageUrl();
+        const preloadedImg = this.preloadedImages.get(url);
+        return preloadedImg?.src || url;
     }
 
-    private setupEventListeners() {
-        const slider = this.shadowRoot!.querySelector('#time-slider') as HTMLInputElement;
-        const sizeButtons = this.shadowRoot!.querySelectorAll('.ha-card-button');
-
-        slider?.addEventListener('input', (e) => {
-            this.currentTimeIndex = parseInt((e.target as HTMLInputElement).value);
-            this.updateImage();
-            this.updateTimeDisplay();
-        });
-
-        sizeButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                this.imgSize = (e.target as HTMLElement).dataset.size!;
-                this.updateSizeButtons();
-                this.updateImage();
-                this.preloadImages();
-            });
-        });
+    private _onSliderInput(event: Event) {
+        this.currentTimeIndex = parseInt((event.target as HTMLInputElement).value);
     }
 
-    private updateImage() {
-        const radarImage = this.shadowRoot!.querySelector('#radar-image') as HTMLImageElement;
-        if (radarImage) radarImage.src = this.getImageUrl();
-    }
-
-    private updateTimeDisplay() {
-        const timeDisplay = this.shadowRoot!.querySelector('#time-display');
-        if (timeDisplay) timeDisplay.textContent = this.getTimeForIndex(this.currentTimeIndex).toLocaleString();
-    }
-
-    private updateSizeButtons() {
-        const sizeButtons = this.shadowRoot!.querySelectorAll('.ha-card-button');
-        sizeButtons.forEach(button => {
-            button.classList.toggle('active', (button as HTMLElement).dataset.size === this.imgSize);
-        });
+    private _onButtonClick(event: Event) {
+        this.imgSize = (event.target as HTMLElement).dataset.size!;
+        this.preloadImages();
     }
 
     private preloadImages() {
-        for (let i = 0; i < this.maxTimeSlots; i++) {
+        for (let i = 0; i < this.config.timeSlotCount; i++) {
             const time = this.getTimeForIndex(i);
             const formatted = this.formatTime(time);
             const url = `https://www.hko.gov.hk/wxinfo/radars/rad_${this.imgSize}_png/2d${this.imgSize}nradar_${formatted}.jpg`;
@@ -139,15 +131,8 @@ export class HkoRadarCard extends HTMLElement {
         }
     }
 
-    getCardSize() {
-        return 3;
-    }
-
-    static getConfigElement() {
-        return document.createElement('hko-radar-card-editor');
-    }
-
-    static getStubConfig() {
-        return {};
-    }
+    // TODO: add editor for this card
+    // static getConfigElement() {
+    //     return document.createElement('hko-radar-card-editor');
+    // }
 }
