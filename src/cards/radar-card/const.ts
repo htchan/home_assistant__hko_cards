@@ -1,3 +1,4 @@
+export const EDITOR_TYPE = "hko-radar-card-editor";
 export const TYPE = "hko-radar-card";
 export const NAME = "HKO Radar Card";
 export const DESCRIPTION = "Display HKO radar images with time slider and size options";

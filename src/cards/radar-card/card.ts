@@ -1,19 +1,21 @@
 import {
     TYPE,
     NAME,
+    EDITOR_TYPE,
     DESCRIPTION,
     MAX_TIME_SLOTS,
     IMG_SIZE_MEDIUM,
     IMG_TIME_OFFSET_MINUTES,
-    IMG_INTERVAL_SLOT_MINUTES
+    IMG_INTERVAL_SLOT_MINUTES,
 } from "./const";
 import { HkoRadarCardConfig } from "./config";
 
 import { html } from "lit";
 
 
-import { HomeAssistantCard } from "../types";
+import { HomeAssistantCard, HomeAssistantCardEditor } from "../types";
 import { cardStyles } from "./card-style";
+import { HkoRadarCardEditor } from "./card-editor";
 
 export class HkoRadarCard extends HomeAssistantCard {
     private config: HkoRadarCardConfig = (this.constructor as typeof HkoRadarCard).getStubConfig();
@@ -34,7 +36,8 @@ export class HkoRadarCard extends HomeAssistantCard {
     static get cardName(): string { return NAME; }
     static get cardDescription(): string { return DESCRIPTION; }
     static get cardPreview(): boolean { return true; }
-
+    static get cardEditor(): typeof HomeAssistantCardEditor { return HkoRadarCardEditor; }
+    static getConfigElement():HTMLElement { return document.createElement(EDITOR_TYPE); }
     static getStubConfig(): HkoRadarCardConfig {
         return {
             defaultSize: IMG_SIZE_MEDIUM,
@@ -130,9 +133,4 @@ export class HkoRadarCard extends HomeAssistantCard {
             }
         }
     }
-
-    // TODO: add editor for this card
-    // static getConfigElement() {
-    //     return document.createElement('hko-radar-card-editor');
-    // }
 }
