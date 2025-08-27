@@ -29,7 +29,7 @@ const SCHEMA = [
         }
     },
     {
-        name: "autoUpdate",
+        name: "autoRefresh",
         label: "Auto Update",
         required: true,
         selector: { 
@@ -42,7 +42,7 @@ export class HkoRadarCardEditor extends HomeAssistantCardEditor {
     private config: HkoRadarCardConfig = {
         defaultSize: IMG_SIZE_MEDIUM,
         timeSlotCount: MAX_TIME_SLOTS,
-        autoUpdate: false,
+        autoRefresh: false,
     };
 
     static get properties() {

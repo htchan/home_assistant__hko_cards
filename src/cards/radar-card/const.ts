@@ -17,5 +17,5 @@ export const IMG_INTERVAL_MS: number = 360000; // 6 minutes
 export interface HkoRadarCardConfig {
     defaultSize: ImgSize;
     timeSlotCount: number;
-    autoUpdate: boolean;
+    autoRefresh: boolean;
 }

@@ -70,7 +70,7 @@ export class HkoRadarCard extends HomeAssistantCard {
         return {
             defaultSize: IMG_SIZE_MEDIUM,
             timeSlotCount: MAX_TIME_SLOTS,
-            autoUpdate: false,
+            autoRefresh: false,
         };
     }
 
@@ -158,7 +158,7 @@ export class HkoRadarCard extends HomeAssistantCard {
 
     private scheduleLatestDatetimeRefresh() {
         const delay = Math.max(timeWithOffset(1).getTime() - new Date().getTime() + IMG_TIME_OFFSET_MS + 5000, 5000); // at least wait for 5 seconds
-        if (this.updateTimer === null && this.config.autoUpdate) {
+        if (this.updateTimer === null && this.config.autoRefresh) {
             this.updateTimer = setTimeout(() => {
                 this.updateLatestDatetime();
                 // clear old timer
@@ -169,7 +169,7 @@ export class HkoRadarCard extends HomeAssistantCard {
                 // schedule next update
                 this.scheduleLatestDatetimeRefresh();
             }, delay);
-        } else if (this.updateTimer !== null && !this.config.autoUpdate) {
+        } else if (this.updateTimer !== null && !this.config.autoRefresh) {
             clearTimeout(this.updateTimer);
             this.updateTimer = null;
         }
