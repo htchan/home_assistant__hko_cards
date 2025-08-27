@@ -73,6 +73,9 @@ export class HkoRadarCard extends HomeAssistantCard {
             autoRefresh: false,
         };
     }
+    static get styles() {
+        return cardStyles;
+    }
 
     constructor() {
         super();
@@ -85,6 +88,7 @@ export class HkoRadarCard extends HomeAssistantCard {
         }
         this.config = config;
         this.imgSize = this.config.defaultSize;
+        this.latestTime = timeWithOffset(0);
         this.currentDatetime = timeWithOffset(0);
 
         this.scheduleLatestDatetimeRefresh();
@@ -93,13 +97,12 @@ export class HkoRadarCard extends HomeAssistantCard {
 
     render() {
         return html`
-            <style>${cardStyles.cssText}</style>
             <ha-card>
                 <div class="card-content">
                     <img id="radar-image" src="${this.getPreloadedImageUrl(this.currentDatetime)}" alt="HKO Radar" />
                 </div>
                 <div class="card-content center">
-                    <input 
+                    <input
                         type="range"
                         style="width: 100%;"
                         min="0" max="${this.config.timeSlotCount - 1}"
