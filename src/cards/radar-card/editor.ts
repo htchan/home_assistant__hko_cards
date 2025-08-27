@@ -1,7 +1,6 @@
 import { html } from "lit";
 import { HomeAssistantCardEditor } from "../types";
-import { HkoRadarCardConfig } from "./config";
-import { EDITOR_TYPE, IMG_SIZE_LARGE, IMG_SIZE_MEDIUM, IMG_SIZE_SMALL, MAX_TIME_SLOTS } from "./const";
+import { EDITOR_TYPE, IMG_SIZE_LARGE, IMG_SIZE_MEDIUM, IMG_SIZE_SMALL, MAX_TIME_SLOTS, HkoRadarCardConfig } from "./const";
 
 const SCHEMA = [
     { 
@@ -29,12 +28,21 @@ const SCHEMA = [
             }
         }
     },
+    {
+        name: "autoUpdate",
+        label: "Auto Update",
+        required: true,
+        selector: { 
+            boolean: {}
+        }
+    }
 ]
 
 export class HkoRadarCardEditor extends HomeAssistantCardEditor {
     private config: HkoRadarCardConfig = {
         defaultSize: IMG_SIZE_MEDIUM,
         timeSlotCount: MAX_TIME_SLOTS,
+        autoUpdate: false,
     };
 
     static get properties() {
