@@ -58,7 +58,6 @@ export class HkoRadarCardEditor extends HomeAssistantCardEditor {
     }
 
     configChanged(newConfig: HkoRadarCardConfig) {
-        console.log("Config changed", newConfig);
         const event = new Event("config-changed", {
             bubbles: true,
             composed: true

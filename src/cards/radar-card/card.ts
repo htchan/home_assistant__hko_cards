@@ -10,15 +10,20 @@ import {
     HkoRadarCardConfig,
 } from "./const";
 
-import { html } from "lit";
+import { html, CSSResult } from "lit";
 
 
 import { HomeAssistantCard, HomeAssistantCardEditor } from "../types";
 import { cardStyles } from "./styles";
 import { HkoRadarCardEditor } from "./editor";
 
+function now() {
+    const date = new Date();
+    return new Date(date.getTime() + (date.getTimezoneOffset() * 60000) + (8 * 3600000));
+}
+
 function timeWithOffset(offsetIntervalCount: number): Date {
-    let nowMs = new Date().getTime();
+    let nowMs = now().getTime();
     return new Date(Math.floor((nowMs - IMG_TIME_OFFSET_MS) / IMG_INTERVAL_MS + offsetIntervalCount) * IMG_INTERVAL_MS);
 }
 
@@ -64,6 +69,7 @@ export class HkoRadarCard extends HomeAssistantCard {
     static get cardName(): string { return NAME; }
     static get cardDescription(): string { return DESCRIPTION; }
     static get cardPreview(): boolean { return true; }
+    static get styles():CSSResult { return cardStyles; }
     static get cardEditor(): typeof HomeAssistantCardEditor { return HkoRadarCardEditor; }
     static getConfigElement():HTMLElement { return document.createElement(EDITOR_TYPE); }
     static getStubConfig(): HkoRadarCardConfig {
@@ -85,6 +91,7 @@ export class HkoRadarCard extends HomeAssistantCard {
         }
         this.config = config;
         this.imgSize = this.config.defaultSize;
+        this.latestTime = timeWithOffset(0);
         this.currentDatetime = timeWithOffset(0);
 
         this.scheduleLatestDatetimeRefresh();
@@ -93,13 +100,12 @@ export class HkoRadarCard extends HomeAssistantCard {
 
     render() {
         return html`
-            <style>${cardStyles.cssText}</style>
             <ha-card>
                 <div class="card-content">
                     <img id="radar-image" src="${this.getPreloadedImageUrl(this.currentDatetime)}" alt="HKO Radar" />
                 </div>
                 <div class="card-content center">
-                    <input 
+                    <input
                         type="range"
                         style="width: 100%;"
                         min="0" max="${this.config.timeSlotCount - 1}"
@@ -157,7 +163,7 @@ export class HkoRadarCard extends HomeAssistantCard {
     }
 
     private scheduleLatestDatetimeRefresh() {
-        const delay = Math.max(timeWithOffset(1).getTime() - new Date().getTime() + IMG_TIME_OFFSET_MS + 5000, 5000); // at least wait for 5 seconds
+        const delay = Math.max(timeWithOffset(1).getTime() - now().getTime() + IMG_TIME_OFFSET_MS + 5000, 5000); // at least wait for 5 seconds
         if (this.updateTimer === null && this.config.autoRefresh) {
             this.updateTimer = setTimeout(() => {
                 this.updateLatestDatetime();
