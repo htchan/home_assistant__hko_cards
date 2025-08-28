@@ -10,7 +10,7 @@ import {
     HkoRadarCardConfig,
 } from "./const";
 
-import { html } from "lit";
+import { html, CSSResult } from "lit";
 
 
 import { HomeAssistantCard, HomeAssistantCardEditor } from "../types";
@@ -64,6 +64,7 @@ export class HkoRadarCard extends HomeAssistantCard {
     static get cardName(): string { return NAME; }
     static get cardDescription(): string { return DESCRIPTION; }
     static get cardPreview(): boolean { return true; }
+    static get styles():CSSResult { return cardStyles; }
     static get cardEditor(): typeof HomeAssistantCardEditor { return HkoRadarCardEditor; }
     static getConfigElement():HTMLElement { return document.createElement(EDITOR_TYPE); }
     static getStubConfig(): HkoRadarCardConfig {
@@ -72,9 +73,6 @@ export class HkoRadarCard extends HomeAssistantCard {
             timeSlotCount: MAX_TIME_SLOTS,
             autoRefresh: false,
         };
-    }
-    static get styles() {
-        return cardStyles;
     }
 
     constructor() {
