@@ -1,6 +1,3 @@
-import { HkoRadarCard } from "../src/cards/radar-card/card";
-import { HkoRadarCardEditor } from "../src/cards/radar-card/editor";
-
 // Mock lit and LitElement before importing
 jest.mock('lit', () => ({
   html: jest.fn((strings, ...values) => strings.reduce((acc: string, str: string, i: number) => acc + str + (values[i] || ''), '')),
@@ -16,9 +13,11 @@ jest.mock('lit', () => ({
   },
 }));
 
+import { HkoRadarCard } from "../src/cards/radar-card/card";
+import { HkoRadarCardEditor } from "../src/cards/radar-card/editor";
+
 // Mock customElements and window
-const mockDefine = jest.fn((name, element) => { return true });
-global.customElements.define = mockDefine
+global.customElements.define = jest.fn((name, element) => { return true })
 
 const mockWindow = global.window as any;
 mockWindow.customCards = [];
@@ -32,8 +31,8 @@ describe('Index', () => {
   test('should register card and editor in customElements', () => {
     require('../src/index');
     
-    expect(mockDefine).toHaveBeenCalledWith('hko-radar-card', HkoRadarCard);
-    expect(mockDefine).toHaveBeenCalledWith('hko-radar-card-editor', HkoRadarCardEditor);
+    expect(global.customElements.define).toHaveBeenCalledWith('hko-radar-card', HkoRadarCard);
+    expect(global.customElements.define).toHaveBeenCalledWith('hko-radar-card-editor', HkoRadarCardEditor);
 
     expect(mockWindow.customCards).toHaveLength(1);
     expect(mockWindow.customCards[0]).toEqual({
