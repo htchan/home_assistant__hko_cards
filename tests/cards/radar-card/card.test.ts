@@ -85,7 +85,7 @@ describe('HkoRadarCard', () => {
 
     test('current datetime', () => {
       expect((card as any).currentDatetime).toBeInstanceOf(Date);
-      expect((card as any).currentDatetime.toISOString()).toBe('2024-01-01T00:54:00.000Z');
+      expect((card as any).currentDatetime.toISOString()).toBe('2024-01-01T08:54:00.000Z');
     });
 
     test('preloaded images', () => {
@@ -95,7 +95,7 @@ describe('HkoRadarCard', () => {
 
     test('latest time', () => {
       expect((card as any).latestTime).toBeInstanceOf(Date);
-      expect((card as any).latestTime.toISOString()).toBe('2024-01-01T00:54:00.000Z');
+      expect((card as any).latestTime.toISOString()).toBe('2024-01-01T08:54:00.000Z');
     });
 
     test('update timer', () => {
@@ -117,7 +117,7 @@ describe('HkoRadarCard', () => {
         expect((card as any).config).toEqual(mockConfig);
         expect((card as any).imgSize).toBe(IMG_SIZE_LARGE);
         expect((card as any).currentDatetime).toBeInstanceOf(Date);
-        expect((card as any).currentDatetime.toISOString()).toBe('2024-01-01T01:24:00.000Z');
+        expect((card as any).currentDatetime.toISOString()).toBe('2024-01-01T09:24:00.000Z');
         expect((card as any).preloadedImages).toBeInstanceOf(Map);
         expect((card as any).preloadedImages.size).toBe(5);
         expect(Array.from((card as any).preloadedImages.keys())).toEqual([
@@ -128,7 +128,7 @@ describe('HkoRadarCard', () => {
           "https://www.hko.gov.hk/wxinfo/radars/rad_256_png/2d256nradar_202401010924.jpg"
         ]);
         expect((card as any).latestTime).toBeInstanceOf(Date);
-        expect((card as any).latestTime.toISOString()).toBe('2024-01-01T01:24:00.000Z');
+        expect((card as any).latestTime.toISOString()).toBe('2024-01-01T09:24:00.000Z');
         expect((card as any).updateTimer).not.toBeNull();
       });
 
@@ -189,7 +189,7 @@ describe('HkoRadarCard', () => {
       });
 
       test('render result depends on current datetime', () => {
-        (card as any).currentDatetime = new Date('2024-01-01T00:00:00Z');
+        (card as any).currentDatetime = new Date('2024-01-01T08:00:00Z');
         expect(card.render()).toEqual(`
             <ha-card>
                 <div class=\"card-content\">
@@ -295,7 +295,7 @@ describe('HkoRadarCard', () => {
         const mockEvent = { target: { value: '5' } } as any;
         (card as any)._onSliderInput(mockEvent);
         expect((card as any).currentDatetime).toBeInstanceOf(Date);
-        expect((card as any).currentDatetime.toISOString()).toBe('2024-01-01T00:00:00.000Z');
+        expect((card as any).currentDatetime.toISOString()).toBe('2024-01-01T08:00:00.000Z');
       });
     });
     
@@ -334,13 +334,13 @@ describe('HkoRadarCard', () => {
     describe('getPreloadedImageUrl', () => {
       test('should return preloaded image URL if available', () => {
         (card as any).preloadImages();
-        const date = new Date('2024-01-01T00:54:00Z');
+        const date = new Date('2024-01-01T08:54:00Z');
         const url = (card as any).getPreloadedImageUrl(date);
         expect(url).toBe('https://www.hko.gov.hk/wxinfo/radars/rad_128_png/2d128nradar_202401010854.jpg');
       });
 
       test('should return constructed URL if not preloaded', () => {
-        const date = new Date('2024-01-01T02:00:00Z');
+        const date = new Date('2024-01-01T10:00:00Z');
         const url = (card as any).getPreloadedImageUrl(date);
         expect(url).toBe('https://www.hko.gov.hk/wxinfo/radars/rad_128_png/2d128nradar_202401011000.jpg');
       });
@@ -356,9 +356,9 @@ describe('HkoRadarCard', () => {
         test('set the timeout', () => {
           (card as any).scheduleLatestDatetimeRefresh();
           expect((card as any).updateTimer).not.toBeNull();
-          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T00:54:00.000Z');
+          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T08:54:00.000Z');
           jest.advanceTimersByTime(245000);
-          expect((card as any).latestTime.toISOString()).toBe('2024-01-01T01:00:00.000Z');
+          expect((card as any).latestTime.toISOString()).toBe('2024-01-01T09:00:00.000Z');
         });
       });
 
@@ -371,9 +371,9 @@ describe('HkoRadarCard', () => {
         test('set the timeout', () => {
           (card as any).scheduleLatestDatetimeRefresh();
           expect((card as any).updateTimer).toBeNull();
-          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T00:54:00.000Z');
+          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T08:54:00.000Z');
           jest.advanceTimersByTime(245000);
-          expect((card as any).latestTime.toISOString()).toBe('2024-01-01T00:54:00.000Z');
+          expect((card as any).latestTime.toISOString()).toBe('2024-01-01T08:54:00.000Z');
         });
       });
     });
@@ -390,8 +390,8 @@ describe('HkoRadarCard', () => {
 
         test('should update private variable', () => {
           (card as any).updateLatestDatetime();
-          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T01:00:00.000Z');
-          expect((card as any).currentDatetime.toISOString()).toEqual('2024-01-01T01:00:00.000Z');
+          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T09:00:00.000Z');
+          expect((card as any).currentDatetime.toISOString()).toEqual('2024-01-01T09:00:00.000Z');
           expect((card as any).preloadedImages.size).toBe(16);
         });
       });
@@ -403,21 +403,21 @@ describe('HkoRadarCard', () => {
 
         test('should update private variable', () => {
           (card as any).updateLatestDatetime();
-          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T01:00:00.000Z');
-          expect((card as any).currentDatetime.toISOString()).toEqual('2023-12-31T23:36:00.000Z');
+          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T09:00:00.000Z');
+          expect((card as any).currentDatetime.toISOString()).toEqual('2024-01-01T07:36:00.000Z');
           expect((card as any).preloadedImages.size).toBe(16);
         });
       });
 
       describe('when currentDateTime is not latestTime nor earliest', () => {
         beforeEach(() => {
-          (card as any).currentDatetime = new Date('2024-01-01T00:00:00Z');
+          (card as any).currentDatetime = new Date('2024-01-01T08:00:00Z');
         });
 
         test('should update private variable', () => {
           (card as any).updateLatestDatetime();
-          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T01:00:00.000Z');
-          expect((card as any).currentDatetime.toISOString()).toEqual('2024-01-01T00:00:00.000Z');
+          expect((card as any).latestTime.toISOString()).toEqual('2024-01-01T09:00:00.000Z');
+          expect((card as any).currentDatetime.toISOString()).toEqual('2024-01-01T08:00:00.000Z');
           expect((card as any).preloadedImages.size).toBe(16);
         });
       });

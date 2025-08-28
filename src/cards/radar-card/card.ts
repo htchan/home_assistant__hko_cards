@@ -16,7 +16,11 @@ import { html, CSSResult } from "lit";
 import { HomeAssistantCard, HomeAssistantCardEditor } from "../types";
 import { cardStyles } from "./styles";
 import { HkoRadarCardEditor } from "./editor";
-import { now } from "../../common/times";
+
+function now() {
+    const date = new Date();
+    return new Date(date.getTime() + (date.getTimezoneOffset() * 60000) + (8 * 3600000));
+}
 
 function timeWithOffset(offsetIntervalCount: number): Date {
     let nowMs = now().getTime();

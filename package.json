@@ -17,9 +17,9 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test": "TZ=UTC jest",
+    "test:watch": "TZ=UTC jest --watch",
+    "test:coverage": "TZ=UTC jest --coverage"
   },    
   "dependencies": {
     "lit": "^3.3.1"
