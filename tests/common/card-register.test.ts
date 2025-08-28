@@ -86,4 +86,34 @@ describe('registerCard', () => {
       });
     });
   });
+
+  describe('customCards is undefined', () => {
+    beforeEach(() => {
+      mockWindow.customCards = undefined;
+    });
+
+
+    const mockCard = {
+      cardType: 'hko-radar-card',
+      cardName: 'HKO Radar Card',
+      cardDescription: 'Display HKO radar images with time slider and size options',
+      cardPreview: true,
+      cardEditor: null,
+    };
+
+    test('should register card and editor in customElements', () => {
+      registerCard((mockCard as typeof HomeAssistantCard));
+      
+      expect(global.customElements.define).toHaveBeenCalledTimes(1)
+      expect(global.customElements.define).toHaveBeenCalledWith('hko-radar-card', mockCard);
+      
+      expect(mockWindow.customCards).toHaveLength(1);
+      expect(mockWindow.customCards[0]).toEqual({
+        type: 'hko-radar-card',
+        name: 'HKO Radar Card',
+        description: 'Display HKO radar images with time slider and size options',
+        preview: true,
+      });
+    });
+  })
 });
