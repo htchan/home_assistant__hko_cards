@@ -16,9 +16,10 @@ import { html, CSSResult } from "lit";
 import { HomeAssistantCard, HomeAssistantCardEditor } from "../types";
 import { cardStyles } from "./styles";
 import { HkoRadarCardEditor } from "./editor";
+import { now } from "../../common/times";
 
 function timeWithOffset(offsetIntervalCount: number): Date {
-    let nowMs = new Date().getTime();
+    let nowMs = now().getTime();
     return new Date(Math.floor((nowMs - IMG_TIME_OFFSET_MS) / IMG_INTERVAL_MS + offsetIntervalCount) * IMG_INTERVAL_MS);
 }
 
@@ -158,7 +159,7 @@ export class HkoRadarCard extends HomeAssistantCard {
     }
 
     private scheduleLatestDatetimeRefresh() {
-        const delay = Math.max(timeWithOffset(1).getTime() - new Date().getTime() + IMG_TIME_OFFSET_MS + 5000, 5000); // at least wait for 5 seconds
+        const delay = Math.max(timeWithOffset(1).getTime() - now().getTime() + IMG_TIME_OFFSET_MS + 5000, 5000); // at least wait for 5 seconds
         if (this.updateTimer === null && this.config.autoRefresh) {
             this.updateTimer = setTimeout(() => {
                 this.updateLatestDatetime();
